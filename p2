@@ -1,0 +1,47 @@
+import gensim.downloader as api
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import numpy as np
+
+def load_model():
+    print("Loading pre-trained word vectors...")
+    model = api.load("glove-wiki-gigaword-100")
+    print("Model loaded successfully!")
+    return model
+
+def visual(model, words, method='pca'):
+    vectors = np.array([model[word] for word in words if word in model])
+    if method == 'pca':
+        reducer = PCA(n_components=2)
+    else:
+        reducer = TSNE(n_components=2, perplexity=5, random_state=42)
+    reduced_vectors = reducer.fit_transform(vectors)
+    plt.figure(figsize=(10, 6))
+    for word, coord in zip(words, reduced_vectors):
+        plt.scatter(coord[0], coord[1])
+        plt.text(coord[0] + 0.05, coord[1] + 0.05, word, fontsize=12)
+    plt.title(f"Word Embeddings Visualization using {method.upper()}")
+    plt.show()
+
+def similar_words(model, word, top_n=5):
+    try:
+        similar_words = model.most_similar(word, topn=top_n)
+        print(f"Top {top_n} words similar to '{word}':")
+        for similar_word, similarity in similar_words:
+            print(f"{similar_word}: {similarity:.4f}")
+    except KeyError:
+        print(f"Word '{word}' not found in the vocabulary.")
+
+def main():
+    model = load_model()
+    domain_words = ["computer", "technology", "internet", "software", "hardware", "AI",
+                    "machine", "data", "network", "program"]
+    visual(model, domain_words, method='pca')
+    while True:
+        word = input("Enter a word to find similar words (or 'exit' to quit): ").strip().lower()
+        if word == 'exit':
+            break
+        similar_words(model, word)
+
+main()
