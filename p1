@@ -1,0 +1,30 @@
+import gensim.downloader as gen
+
+def load_model():
+    print("Loading pre-trained word vectors...")
+    m = gen.load("glove-wiki-gigaword-100")
+    print("Model loaded successfully!")
+    return m
+
+def similar_word(model, word1, word2, word3):
+    try:
+        print(f"Exploring relationships: {word1} - {word2} + {word3}")
+        result = model.most_similar(positive=[word1, word3], negative=[word2])
+        print("Most similar words:")
+        for word, per in result:
+            print(f"{word}: {per:.4f}")
+    except KeyError as e:
+        print(f" Word '{word}' not found in the vocabulary.")
+
+def main():
+    model = load_model()
+    while True:
+        print("\nEnter three words (or 'exit' to quit):")
+        word1 = input("Word 1: ").strip().lower()
+        if word1 == 'exit':
+            break
+        word2 = input("Word 2: ").strip().lower()
+        word3 = input("Word 3: ").strip().lower()
+        similar_word(model, word1, word2, word3)
+
+main()
