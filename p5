@@ -1,0 +1,35 @@
+import gensim.downloader as api
+import random
+
+print("Loading pre-trained Word2Vec embeddings...")
+word_vectors = api.load("word2vec-google-news-300")
+
+def similar_words(seed_word, top_n=5):
+    try:
+        similar_words = word_vectors.most_similar(seed_word, topn=top_n)
+        return [word for word, _ in similar_words]
+    except KeyError:
+        print(f"'{seed_word}' is not in the vocabulary. Please try another word.")
+        return []
+
+def construct_paragraph(seed_word, similar_words):
+    sentences = [
+        f"Once upon a time, there was a {seed_word}.",
+        f"The {seed_word} was known for its connection to {similar_words[0]} and {similar_words[1]}.",
+        f"One day, the {seed_word} encountered a {similar_words[2]} and they became great friends.",
+        f"Together, they explored the world of {similar_words[3]} and discovered the wonders of {similar_words[4]}.",
+        f"In the end, the {seed_word} realized that life is full of surprises and adventures."
+    ]
+    return " ".join(sentences)
+
+def main():
+    seed_word = input("Enter a seed word: ").strip().lower()
+    similar_word = similar_words(seed_word)
+    if not similar_word:
+        return
+    print(f"\nSimilar words to '{seed_word}': {', '.join(similar_word)}")
+    paragraph = construct_paragraph(seed_word, similar_word)
+    print("\nHere's a short paragraph/story:\n")
+    print(paragraph)
+
+main()
