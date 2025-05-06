@@ -1,0 +1,28 @@
+import gensim
+from gensim.models import Word2Vec
+from nltk.tokenize import TreebankWordTokenizer
+
+tokenizer = TreebankWordTokenizer()
+
+legal_corpus = [
+    "The plaintiff filed a lawsuit against the defendant for breach of contract.",
+    "The court ruled in favor of the defendant due to lack of evidence.",
+    "A new legal precedent was set in the case of intellectual property rights.",
+    "The judge dismissed the case citing jurisdictional issues.",
+    "The attorney argued that the contract was legally binding."
+]
+
+legal_sentences = [tokenizer.tokenize(sentence.lower()) for sentence in legal_corpus]
+
+model = Word2Vec(sentences=legal_sentences, vector_size=100, window=5, min_count=1, workers=4)
+
+model.save("legal_word2vec.model")
+
+model = Word2Vec.load("legal_word2vec.model")
+
+word = "court"
+if word in model.wv:
+    print(f"Words most similar to '{word}':")
+    print(model.wv.most_similar(word))
+else:
+    print(f"'{word}' not found in vocabulary.")
