@@ -1,0 +1,67 @@
+import wikipediaapi
+from pydantic import BaseModel, ValidationError
+import re
+
+class InstitutionDetails(BaseModel):
+    name: str
+    founder: str
+    founded_year: str
+    branches: list[str]
+    employees: int
+    summary: str
+
+def fetch_institution_details(institution_name: str) -> InstitutionDetails:
+    user_agent = "InstitutionDetailFetcher/1.0 (your-email@example.com)"
+    wiki_wiki = wikipediaapi.Wikipedia(language='en', user_agent=user_agent)
+    page = wiki_wiki.page(institution_name)
+
+    if not page.exists():
+        raise ValueError(f"Page for {institution_name} not found on Wikipedia.")
+
+    text = page.text
+
+    founder_search = re.search(r"Founders?[:\s]*([A-Za-z\s,]+)", text)
+    founder = founder_search.group(1) if founder_search else "Not Available"
+
+    founded_search = re.search(r"Founded[\s:]*([0-9]{4})", text)
+    founded_year = founded_search.group(1) if founded_search else "Not Available"
+
+    branches_search = re.findall(r"Branches?:\s*([\w\s,]+)", text)
+    branches = [branch.strip() for branch in branches_search] if branches_search else []
+
+    employees_search = re.search(r"Employees?:\s*([\d,]+)", text)
+    employees = int(employees_search.group(1).replace(',', '')) if employees_search else 0
+
+    summary = " ".join(text.split("\n")[:4]).strip()
+
+    details_dict = {
+        "name": institution_name,
+        "founder": founder,
+        "founded_year": founded_year,
+        "branches": branches,
+        "employees": employees,
+        "summary": summary
+    }
+
+    try:
+        institution_details = InstitutionDetails(**details_dict)
+    except ValidationError as e:
+        print(f"Validation error: {e}")
+        return None
+
+    return institution_details
+
+institution_name = input("Enter the institution name: ")
+
+try:
+    details = fetch_institution_details(institution_name)
+    if details:
+        print("\nInstitution Details:")
+        print(f"Name: {details.name}")
+        print(f"Founder: {details.founder}")
+        print(f"Founded Year: {details.founded_year}")
+        print(f"Branches: {', '.join(details.branches) if details.branches else 'Not Available'}")
+        print(f"Employees: {details.employees}")
+        print(f"Summary: {details.summary}")
+except Exception as e:
+    print(f"An error occurred: {e}")
