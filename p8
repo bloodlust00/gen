@@ -1,8 +1,8 @@
 import gdown
 
 # Replace this with your actual Google Drive file ID (from a shareable link)
-file_id = "103991506358074005300&rtpof=true&sd=true"  # <-- Change this to your file ID
-url = f"https://docs.google.com/document/d/12QVZBxLQdI5Fdx22jbUlUxf4miTJ-wRH/edit?usp=sharing&ouid=103991506358074005300&rtpof=true&sd=true"
+file_id = "10Tc7hsxqEA6o8mRZrGrbphNJ5Ep1pdsj"  # <-- Change this to your file ID
+url = f"https://docs.google.com/document/d/10Tc7hsxqEA6o8mRZrGrbphNJ5Ep1pdsj/edit?usp=sharing&ouid=110258667970037103275&rtpof=true&sd=true"
 output_file = "document.txt"
 gdown.download(url, output_file, quiet=False)
 
