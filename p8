@@ -1,4 +1,5 @@
 import gdown
+//pip install langchain cohere langchain-community google-colab
 
 # Replace this with your actual Google Drive file ID (from a shareable link)
 file_id = "10Tc7hsxqEA6o8mRZrGrbphNJ5Ep1pdsj"  # <-- Change this to your file ID
