@@ -1,0 +1,24 @@
+from transformers import pipeline
+
+model_name = "facebook/bart-large-cnn"
+summarizer = pipeline("summarization", model=model_name)
+
+def summarize_text(text, max_length=130, min_length=30, do_sample=False):
+    summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=do_sample)
+    summarized_text = summary[0]['summary_text']
+    return summarized_text
+
+if __name__ == "__main__":
+    passage = """
+    The Hugging Face Transformers library provides an easy-to-use interface for working 
+    with pre-trained models for various NLP tasks, including summarization.  
+    Summarization is the task of reducing a long text into a shorter version while 
+    preserving the key information.  
+    This can be particularly useful for quickly understanding the main points of lengthy 
+    documents, articles, or reports.  
+    The library supports several pre-trained models that can be used out-of-the-box for 
+    summarization tasks.
+    """
+    summarized_text = summarize_text(passage)
+    print("Original Text:\n", passage)
+    print("\nSummarized Text:\n", summarized_text)
