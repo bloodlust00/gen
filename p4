@@ -1,19 +1,32 @@
-import pandas as pd
-def find_s_algorithm(file_path):
- data = pd.read_csv(file_path)
- print("Training data:")
- print(data)
- attributes = data.columns[:-1]
- class_label = data.columns[-1]
- hypothesis = ['?' for _ in attributes]
- for index, row in data.iterrows():
- if row[class_label] == 'Yes':
- for i, value in enumerate(row[attributes]):
- if hypothesis[i] == '?' or hypothesis[i] == value:
- hypothesis[i] = value
- else:
- hypothesis[i] = '?'
- return hypothesis
-file_path = 'training_data.csv'
-hypothesis = find_s_algorithm(file_path)
-print("\nThe final hypothesis is:", hypothesis)
+import gensim.downloader as api
+from transformers import pipeline
+
+embedding_model = api.load("glove-wiki-gigaword-100")
+
+original_prompt = "Describe the beautiful landscape during sunset"
+
+def enrich_prompt(prompt, embedding_model, n=5):
+    words = prompt.split()
+    enriched_prompt = []
+
+    for word in words:
+        
+        word_lower = word.lower()
+        
+        if word_lower in embedding_model:
+            similar_words = embedding_model.most_similar(word_lower, topn=n)
+            similar_word_list = [w[0] for w in similar_words]
+            enriched_prompt.append(word + " (" + ', '.join(similar_word_list[:1]) + ")")
+        else:
+            enriched_prompt.append(word)
+    return ' '.join(enriched_prompt)
+enriched_prompt = enrich_prompt(original_prompt, embedding_model)
+generator = pipeline("text-generation", model="gpt2")
+original_response = generator(original_prompt, max_length=50, num_return_sequences=1)
+enriched_response = generator(enriched_prompt, max_length=50, num_return_sequences=1)
+print("Original Prompt Response:")
+print(original_response[0]['generated_text'])
+print("\nEnriched Prompt:")
+print(enriched_prompt)
+print("Enriched Prompt Response:")
+print(enriched_response[0]['generated_text'])
